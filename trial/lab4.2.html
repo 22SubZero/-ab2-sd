@@ -7,11 +7,19 @@
   <style>
     body {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 0;
+      padding: 0;
+    }
+    form, #countryInfo {
+      margin-right: 20px;
     }
     form {
-      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    #countryInfo {
+      align-self: center;
     }
     ul {
       list-style-type: none;
@@ -23,6 +31,9 @@
     img {
       max-width: 50px;
       height: auto;
+    }
+    #neighbours {
+      margin-left: 20px;
     }
   </style>
 </head>
@@ -38,10 +49,7 @@
     <p id="infoContent"></p>
   </div>
 
-  <div>
-    <h2>Neighbouring Countries:</h2>
-    <ul id="neighbours"></ul>
-  </div>
+  <ul id="neighbours"></ul>
 
   <script>
     async function fetchCountryInfo() {
