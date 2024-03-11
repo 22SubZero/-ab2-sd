@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Information</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: block;
+    }
+    input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        display: block;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: block;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .error {
+        color: red;
+        display: block;
+    }
+    h3, p {
+        margin: 0;
+    }
+    img {
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<form class="container">
+    <h2>Country Information</h2>
+    <label for="countryInput">Enter a country name:</label>
+    <input type="text" id="countryInput" placeholder="Enter a country name">
+    <button onclick="fetchCountryInfo()">Submit</button>
+    <div id="countryInfo">
+        <h3></h3>
+        <p>Capital: </p>
+        <p>Population: </p>
+        <p>Region: </p>
+        <img src="" alt="Flag" width="100">
+        <p></p>
+    </div>
+</form>
+
+<script>
+function fetchCountryInfo() {
+    const input = document.getElementById('countryInput').value.trim();
+    if (input === '') {
+        alert('Please enter a country name.');
+        return;
+    }
+
+    fetch(`https://restcountries.com/v3.1/name/${input}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Country not found.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const country = data[0];
+        const { capital, population, region, flags, borders } = country;
+
+        let borderCountriesInfo = '';
+        if (borders) {
+            borderCountriesInfo = 'Bordering Countries: ';
+            borders.forEach(border => {
+                borderCountriesInfo += `${border}, `;
+            });
+        }
+
+        const countryInfo = document.getElementById('countryInfo');
+        countryInfo.children[0].textContent = input;
+        countryInfo.children[1].textContent = `Capital: ${capital}`;
+        countryInfo.children[2].textContent = `Population: ${population}`;
+        countryInfo.children[3].textContent = `Region: ${region}`;
+        countryInfo.children[4].setAttribute('src', flags.svg);
+        countryInfo.children[5].textContent = borderCountriesInfo;
+
+    })
+    .catch(error => {
+        document.getElementById('countryInfo').innerHTML = `<p class="error">${error.message}</p>`;
+    });
+}
+</script>
+
+</body>
+</html>
