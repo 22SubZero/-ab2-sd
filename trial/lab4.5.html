@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Information</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: block;
+    }
+    input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        display: block;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: block;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .error {
+        color: red;
+        display: block;
+    }
+    h3, p {
+        margin: 0;
+    }
+    img {
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<form class="container">
+    <h2>Country Information</h2>
+    <label for="countryInput">Enter a country name:</label>
+    <input type="text" id="countryInput" placeholder="Enter a country name">
+    <button onclick="fetchCountryInfo()">Submit</button>
+    <p id="countryInfo"></p>
+</form>
+
+<script>
+function fetchCountryInfo() {
+    const input = document.getElementById('countryInput').value.trim();
+    if (input === '') {
+        alert('Please enter a country name.');
+        return;
+    }
+
+    fetch(`https://restcountries.com/v3.1/name/${input}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Country not found.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const country = data[0];
+        const { capital, population, region, flags, borders } = country;
+
+        let borderCountriesInfo = '';
+        if (borders && borders.length > 0) {
+            borderCountriesInfo = 'Bordering Countries: ';
+            borders.forEach(border => {
+                borderCountriesInfo += `${border}, `;
+            });
+            borderCountriesInfo = borderCountriesInfo.slice(0, -2); // Remove the trailing comma and space
+            borderCountriesInfo += '<br>';
+        }
+
+        const countryInfoHTML = `
+            <h3>${input}</h3>
+            <p>${borderCountriesInfo}</p>
+            <p>Capital: ${capital}</p>
+            <p>Population: ${population}</p>
+            <p>Region: ${region}</p>
+            <img src="${flags.svg}" alt="${input} flag" width="100">
+        `;
+
+        document.getElementById('countryInfo').innerHTML = countryInfoHTML;
+    })
+    .catch(error => {
+        document.getElementById('countryInfo').innerHTML = `<p class="error">${error.message}</p>`;
+    });
+}
+</script>
+
+</body>
+</html>
