@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Information</title>
+</head>
+<body>
+    <input type="text" id="countryInput" placeholder="Enter country name">
+    <button onclick="fetchCountryInfo()">Submit</button>
+    
+    <p id="countryInfo"></p>
+    <p id="neighboringCountries"></p>
+
+    <script>
+        async function fetchCountryInfo() {
+            const input = document.getElementById("countryInput").value;
+            const url = `https://restcountries.com/v3.1/name/${input}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const countryData = data[0];
+                    const { capital, population, region, flags, borders } = countryData;
+
+                    let countryInfo = `Capital: ${capital}<br>Population: ${population}<br>Region: ${region}<br>`;
+
+                    if (flags) {
+                        countryInfo += `<img src="${flags.png}" alt="Flag of ${input}"><br>`;
+                    }
+
+                    document.getElementById("countryInfo").innerHTML = countryInfo;
+
+                    if (borders) {
+                        let neighboringCountries = "<strong>Neighboring Countries:</strong><br>";
+                        for (const border of borders) {
+                            const borderCountry = await fetchNeighborCountry(border);
+                            neighboringCountries += `${borderCountry.name} <img src="${borderCountry.flags.png}" alt="Flag of ${borderCountry.name}" style="width: 20px; height: 15px;"> <br>`;
+                        }
+                        document.getElementById("neighboringCountries").innerHTML = neighboringCountries;
+                    } else {
+                        document.getElementById("neighboringCountries").innerHTML = "";
+                    }
+                } else {
+                    throw new Error("Country not found!");
+                }
+            } catch (error) {
+                console.error("Error:", error.message);
+                document.getElementById("countryInfo").innerHTML = error.message;
+                document.getElementById("neighboringCountries").innerHTML = "";
+            }
+        }
+
+        async function fetchNeighborCountry(countryCode) {
+            const response = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode}`);
+            const data = await response.json();
+            return data;
+        }
+    </script>
+</body>
+</html>
